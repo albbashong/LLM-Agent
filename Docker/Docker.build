@@ -1,0 +1,64 @@
+FROM ubuntu:24.04
+WORKDIR /home/llm_agent
+EXPOSE 9001 9002 9003 9004 9005
+
+
+# 패키지 관련 추가 명시
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    zlib1g-dev \
+    libssl-dev \
+    libpam0g-dev \
+    libselinux1-dev \
+    pkg-config \
+    libedit-dev \
+    curl \
+    wget \
+    systemd \
+    && apt-get clean
+
+
+# openssh 설치
+
+RUN curl -O https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.9p2.tar.gz && \
+    tar -xzf openssh-9.9p2.tar.gz && \
+    cd openssh-9.9p2 && \
+    ./configure --sysconfdir=/etc/ssh --with-md5-passwords --with-pam && \
+    make -j$(nproc) && \
+    make install
+
+
+
+RUN mv /usr/sbin/sshd /usr/sbin/sshd.bak && \
+    ln -s /usr/local/sbin/sshd /usr/sbin/sshd
+
+# SSH 설정 디렉토리 생성
+RUN mkdir -p /var/run/sshd && \
+    echo 'root:root' | chpasswd
+
+# SSH 설정 파일 복사 또는 수정 (필요 시)
+COPY sshd_config /etc/ssh/sshd_config
+
+
+CMD ["/usr/sbin/sshd", "-D"]
+
+
+# 사용자 생성 아이디: llm 비밀번호: llm
+RUN useradd -m -s /bin/bash llm && echo "llm:llm" | chpasswd && adduser llm sudo
+
+# 사용자 홈에 .xsession 생성
+USER llm
+RUN echo "startxfce4" > ~/.xsession
+
+# 다시 루트로 전환
+USER root
+
+# xrdp 설정
+RUN systemctl enable xrdp
+
+# 시작 명령
+CMD ["/usr/sbin/xrdp", "--nodaemon"]
+
+
+
