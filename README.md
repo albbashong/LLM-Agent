@@ -1,11 +1,9 @@
 # LLM-Agent
 ---
 본 LLM-Agent는local 모델 또는 API를 이용한 agent 시스템을 구성하는 방식
----
+
+
 # 시스템 구성 
-
-
----
 
 ## LLM모델 서버 <-> Linux agent 서버
 코드작성 및 실행 시 모든 언어에 대해서 조건문을 적용할 수 없으므로
