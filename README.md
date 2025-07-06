@@ -47,3 +47,7 @@ subprocess.run(["javac", "HelloPopup.java"], check=True)
 # 자바 실행
 subprocess.run(["java", "HelloPopup"], check=True)
 ```
+
+
+# How to install
+코드 작성 중 
