@@ -16,7 +16,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     wget \
     systemd \
-    && apt-get clean
+    supervisor wget curl git net-tools \
+    x11vnc xvfb fluxbox chromium-browser \
+    python3 python3-pip \
+    && apt clean
 
 
 # openssh 설치
@@ -61,4 +64,18 @@ RUN systemctl enable xrdp
 CMD ["/usr/sbin/xrdp", "--nodaemon"]
 
 
+# NoVNC 설치 
 
+RUN git clone https://github.com/novnc/noVNC.git /opt/noVNC && \
+    git clone https://github.com/novnc/websockify /opt/noVNC/utils/websockify
+
+# VNC 비밀번호 없이 설정
+RUN mkdir -p ~/.vnc && \
+    x11vnc -storepasswd 1234 ~/.vnc/passwd
+
+# startup 스크립트 복사 및 권한 부여
+COPY startup.sh /opt/startup.sh
+RUN chmod +x /opt/startup.sh
+
+# 컨테이너 시작 시 스크립트 실행
+CMD ["/opt/startup.sh"]
