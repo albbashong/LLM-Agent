@@ -1,6 +1,6 @@
 # LLM-Agent
 ---
-본 LLM-Agent는local 모델 또는 API를 이용한 agent 시스템을 구성하는 방식
+본 LLM-Agent는local 모델 또는 LLM API를 이용한 agent 시스템을 구성하는 방식
 
 
 # 시스템 구성 
