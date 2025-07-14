@@ -3,6 +3,12 @@
 본 LLM-Agent는local 모델 또는 LLM API를 이용한 agent 시스템을 구성하는 방식
 
 
+
+##Agent 서버 화면
+<img width="1912" height="1013" alt="Image" src="https://github.com/user-attachments/assets/be96d40c-1939-482d-b2ac-319baafb503e" />
+
+
+
 # 시스템 구성 
 ---
 ## LLM모델 서버 <-> Linux agent 서버(Docker)
