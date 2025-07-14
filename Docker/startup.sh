@@ -1,81 +1,31 @@
-FROM ubuntu:24.04
-WORKDIR /home/llm_agent
-EXPOSE 9001 9002 9003 9004 9005
+#!/bin/bash
 
+export DISPLAY=:1
 
-# 패키지 관련 추가 명시
+# 1. Xvfb 실행
+if [ ! -f /tmp/.X1-lock ]; then
+    Xvfb :1 -screen 0 1280x720x24 &
+    sleep 2
+fi
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    zlib1g-dev \
-    libssl-dev \
-    libpam0g-dev \
-    libselinux1-dev \
-    pkg-config \
-    libedit-dev \
-    curl \
-    wget \
-    systemd \
-    supervisor wget curl git net-tools \
-    x11vnc xvfb fluxbox chromium-browser \
-    python3 python3-pip \
-    && apt clean
+# 2. 권한 생성
+xauth generate :1 . trusted
+xauth add :1 . $(xauth list :1 | awk '{print $3}')
 
+# 3. 윈도우 매니저 실행
+fluxbox &
 
-# openssh 설치
+# 4. VNC 서버 실행
+x11vnc -display :1 -auth /root/.Xauthority -forever -nopw -shared -bg
 
-RUN curl -O https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.9p2.tar.gz && \
-    tar -xzf openssh-9.9p2.tar.gz && \
-    cd openssh-9.9p2 && \
-    ./configure --sysconfdir=/etc/ssh --with-md5-passwords --with-pam && \
-    make -j$(nproc) && \
-    make install
+# 5. Chrome 실행
+google-chrome --no-sandbox --disable-dev-shm-usage --disable-gpu&
 
+# 6. noVNC 실행
+/opt/noVNC/utils/novnc_proxy --vnc localhost:5900 --listen 9001 &
 
+# 7. xrdp 실행
+/usr/sbin/xrdp --nodaemon &
 
-RUN mv /usr/sbin/sshd /usr/sbin/sshd.bak && \
-    ln -s /usr/local/sbin/sshd /usr/sbin/sshd
-
-# SSH 설정 디렉토리 생성
-RUN mkdir -p /var/run/sshd && \
-    echo 'root:root' | chpasswd
-
-# SSH 설정 파일 복사 또는 수정 (필요 시)
-COPY sshd_config /etc/ssh/sshd_config
-
-
-CMD ["/usr/sbin/sshd", "-D"]
-
-
-# 사용자 생성 아이디: llm 비밀번호: llm
-RUN useradd -m -s /bin/bash llm && echo "llm:llm" | chpasswd && adduser llm sudo
-
-# 사용자 홈에 .xsession 생성
-USER llm
-RUN echo "startxfce4" > ~/.xsession
-
-# 다시 루트로 전환
-USER root
-
-# xrdp 설정
-RUN systemctl enable xrdp
-
-# 시작 명령
-CMD ["/usr/sbin/xrdp", "--nodaemon"]
-
-
-# NoVNC 설치 
-
-RUN git clone https://github.com/novnc/noVNC.git /opt/noVNC && \
-    git clone https://github.com/novnc/websockify /opt/noVNC/utils/websockify
-
-# VNC 비밀번호 없이 설정
-RUN mkdir -p ~/.vnc && \
-    x11vnc -storepasswd 1234 ~/.vnc/passwd
-
-# startup 스크립트 복사 및 권한 부여
-COPY startup.sh /opt/startup.sh
-RUN chmod +x /opt/startup.sh
-
-# 컨테이너 시작 시 스크립트 실행
-CMD ["/opt/startup.sh"]
+# 8. SSH 데몬 실행 (마지막 foreground)
+exec /usr/sbin/sshd -D
