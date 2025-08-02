@@ -2,6 +2,16 @@
 ---
 본 LLM-Agent는local 모델 또는 LLM API를 이용한 agent 시스템을 구성하는 방식
 
+## 프로젝트 참여도
+이 프로젝트는 개인 단독으로 설계 및 개발하였으며, 다음과 같은 역할을 수행하였습니다.
+
+- FastAPI 기반 웹서버, 자동화 에이전트, Web UI 전반 개발
+- LLM 응답 처리 구조 및 GUI 자동화 아키텍처 설계
+- Xvfb, fluxbox, xdotool, Chrome, 등 도구 통합 및 디버깅
+- LLM (Gemma 2B)과의 연동 및 코드 실행 자동화
+- Docker 기반 GUI 환경 구성 및 실시간 이미지 전송 처리
+- 전체 로직 테스트 및 문서화
+
 
 # 인터넷 검색
 https://github.com/user-attachments/assets/f75b47dd-d0fb-4642-bc06-bd2c42601444
