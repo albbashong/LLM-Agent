@@ -3,10 +3,8 @@
 export DISPLAY=:1
 
 # 1. Xvfb 실행
-if [ ! -f /tmp/.X1-lock ]; then
-    Xvfb :1 -screen 0 1280x720x24 &
-    sleep 2
-fi
+Xvfb :1 -screen 0 1280x720x24 &
+
 
 # 2. 권한 생성
 xauth generate :1 . trusted
