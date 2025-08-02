@@ -3,12 +3,13 @@
 본 LLM-Agent는local 모델 또는 LLM API를 이용한 agent 시스템을 구성하는 방식
 
 
-https://github.com/user-attachments/assets/01c0f809-bdcd-4c0f-a84a-20fa0c8e64c5
+
+https://github.com/user-attachments/assets/f75b47dd-d0fb-4642-bc06-bd2c42601444
 
 
 
-https://github.com/user-attachments/assets/de688b3f-0dd7-4ada-a0b4-327e8d3694df
 
+https://github.com/user-attachments/assets/ba97a216-a3f9-4e7e-ad06-0191a1825b3c
 
 
 
