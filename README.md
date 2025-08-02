@@ -29,7 +29,7 @@ https://github.com/user-attachments/assets/ba97a216-a3f9-4e7e-ad06-0191a1825b3c
 
 
 
-# 시스템 구성 
+# 시스템 구성
 ---
 ## LLM모델 서버 <-> Linux agent 서버(Docker)
 
@@ -59,7 +59,7 @@ with open("HelloPopup.java", "w", encoding="utf-8") as f:
 print("Java 파일 생성 완료: HelloPopup.java")
 ```
 
-### 스크립트 실행 코드
+### 스크립트 실행 코드 (python 외 언어는 구현중)
 ```
 import subprocess
 
@@ -73,6 +73,8 @@ subprocess.run(["javac", "HelloPopup.java"], check=True)
 # 자바 실행
 subprocess.run(["java", "HelloPopup"], check=True)
 ```
+
+
 # 프로젝트 세부 내용
 ## LLM model 
 본 환경은 Gemma-2b 모델을 사용했습니다.
