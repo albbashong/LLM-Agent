@@ -20,7 +20,7 @@ logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s 
 
 class CodeExtractor:
     def extract(self, text: str) -> str:
-        """LLM 응답에서 Python 코드 추출"""
+        # LLM 응답에서 python 코드 추출
         
         if  re.search(r"```(?:python)?\n(.+?)```", text, re.DOTALL)!=None:
             match = re.search(r"```(?:python)?\n(.+?)```", text, re.DOTALL)
@@ -78,7 +78,7 @@ class WebSearchExecutor:
     def __init__(self, display=":1"):
         self.env = os.environ.copy()
         self.env["DISPLAY"] = display
-        self.env["XDG_RUNTIME_DIR"] = "/tmp/runtime-root"  # 안전한 tmp 디렉토리
+        self.env["XDG_RUNTIME_DIR"] = "/tmp/runtime-root"  #tmp 폴더를 통한 임시폴더
         os.makedirs(self.env["XDG_RUNTIME_DIR"], exist_ok=True)
     
     def get_text(self,query):
@@ -95,10 +95,10 @@ class WebSearchExecutor:
     def clean_ocr_text(self, text: str, k: int = 3) -> list:
         lines = text.split('\n')
 
-        # 1. 빈 줄 제거 및 좌우 공백 제거
+        # 빈줄 제거 및 좌우 공백 제거
         lines = [line.strip() for line in lines if line.strip()]
 
-        # 2. 중복 제거
+        # 중복 제거
         seen = set()
         unique_lines = []
         for line in lines:
@@ -106,23 +106,23 @@ class WebSearchExecutor:
                 seen.add(line)
                 unique_lines.append(line)
 
-        # 3. 의미 없는 짧은 텍스트 필터링 (예: "더보기", "설정")
+        # 상단부 내용 지우기
         keywords_to_ignore = {"더보기", "설정", "로그인", "도움말", "뉴스", "이미지"}
         filtered = [
             line for line in unique_lines
             if len(line) > 6 and not any(word in line for word in keywords_to_ignore)
         ]
 
-        # 4. 한글 또는 영문 위주 문장 필터링 (광고 등 배제)
+        # 필터링
         regex = re.compile(r"[가-힣a-zA-Z0-9 ]{5,}")
         cleaned = [line for line in filtered if regex.search(line)]
 
-        # 5. 상위 k개 추출
+        # 상위 k개 추출
         return cleaned[:k]
     
     
     def open_chrome_and_search(self, query: str):
-        # Step 1: Chrome 실행 (이미 떠 있으면 생략 가능)
+        # 현재 실행중인 Chrome 종료 후 실행
         logging.info(f"검색내용: {query}")
         subprocess.run(["pkill", "-f", "chrome"])
         time.sleep(2)
@@ -140,7 +140,7 @@ class WebSearchExecutor:
                     ],
                     env=self.env
                 )
-        time.sleep(2)  # 브라우저 띄우는 시간 확보
+        time.sleep(2)  # time 시간확보
 
         subprocess.run(
         ["xdotool", "search", "--onlyvisible", "--name", "Chrome"],
@@ -150,11 +150,11 @@ class WebSearchExecutor:
     )
         
         
-        # Step 2: 주소창으로 이동 (Ctrl+L)
+        # ctrl +l 을 이용한 주소창 이동
         subprocess.run(["xdotool", "key", "ctrl+l"], env=self.env)
         time.sleep(0.3)
         encoded_query = urllib.parse.quote_plus(query)
-        # Step 3: 검색어 입력 및 엔터
+        # 검색어 입력 후 엔터
         subprocess.run(["xdotool", "type", f"https://www.google.com/search?q={encoded_query}"], env=self.env)
         time.sleep(0.5)
         
@@ -189,7 +189,7 @@ class CodeRunner:
         time.sleep(0.2)
         
         
-        #vi 를 통한 python 파일 생성
+        # vi 를 통한 python 파일 생성
         subprocess.run(["xdotool", "type", "vi code.py"],env=self.env)
         time.sleep(0.2) 
         
@@ -214,7 +214,7 @@ class CodeRunner:
         if code:
             lines = code.strip().split("\n")
             for line in lines:
-                print(repr(line))  # ← 줄에 특이 문자 있는지 확인
+                print(repr(line))
                 subprocess.run(["xdotool", "type", line], env=self.env)
                 subprocess.run(["xdotool", "key", "Return"], env=self.env)
                 time.sleep(0.1)
