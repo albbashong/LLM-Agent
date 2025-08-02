@@ -58,7 +58,7 @@ class WebServer():
         self.app = FastAPI()
         self.latest_image_base64=""
         self.latest_agent_message = ""
-    # --- 5. HTML 템플릿 생성 ---
+    # html 랜더링
     def render_html(self, response: str = "") -> str:
         # return f"""
         # <!DOCTYPE html>
@@ -110,12 +110,12 @@ class WebServer():
         
         
     def extract_code(self,text) -> str:
-        """코드 블록을 추출 (Python 또는 일반 코드 블록 포함)"""
+        """python 코드 블록 추출"""
         match = re.search(r"```(?:python)?\n(.+?)```", text, re.DOTALL)
         return match.group(1).strip() if match else None
 
     def extract_keyword(self,text) -> str:
-        #핵심단어 추출
+        # 단어 추출
         okt = Okt()
         cleaned_text = re.sub(r"[^\w\s]", "", text)
         nouns = okt.nouns(cleaned_text)  # 명사만 추출
@@ -150,7 +150,7 @@ class WebServer():
             return user_input + "\n코드는 줄바꿈과 들여쓰기를 포함해서 정확히 보여줘."
         elif command == "web":
             return f"""
-        "{user_input}" 에 대한 내용을 요약하시오.
+        \"{user_input}\" 에 대한 내용을 요약하시오.
             가능한 응답:
             **핵심단어:** [관련된 키워드들을 쉼표로 나열해 주세요]
             """
@@ -160,24 +160,24 @@ class WebServer():
 
     def clean_command(self, command: str)->str:
         """
-        LLM에서 받은 command 문자열을 정제하여 
+        LLM에서 받은 command 문자열을
         "code", "web", "agent", "llm" 중 하나로 반환.
         """
         if not isinstance(command, str):
             return ""
 
-        # 1. 양쪽 따옴표 제거 및 공백 제거
+        # 따옴표 제거 및 쌍따옴표 제거
         command = command.strip().strip('"').strip("'")
 
-        # 2. 개행 제거 및 소문자화
+        #  개행 제거 및 소문자화
         command = command.lower().strip()
 
-        # 3. 허용된 명령어만 필터링
+        
         allowed = {"code", "web", "agent", "llm"}
         if command in allowed:
             return command
 
-        # 4. 혹시라도 LLM이 문장으로 출력한 경우 예: "이 요청은 code로 분류됩니다."
+        # command에 일치하는 문자 반환
         match = re.search(r'\b(code|web|agent|llm)\b', command.lower())
         if match:
             return match.group(1)
@@ -192,17 +192,17 @@ def setup_routes(app: FastAPI, web_server: WebServer):
 
     @app.post("/chat", response_class=HTMLResponse)
     async def chat(user_input: str = Form(...)):
-        # 1. 명령 분류용 프롬프트
+        # 명령 분류용 프롬프트
         classification_prompt = web_server.pre_proceccing_build_prompt(user_input)
         command = await run_in_threadpool(custom_llm.generate_response, classification_prompt)
         command = web_server.clean_command(command)
-        # 2. 명령에 따라 응답용 프롬프트 구성
+        # 사용자의 질문에 대한 command 및 응답 생성
         response_prompt = web_server.build_prompt(user_input, command)
 
-        # 3. 실제 응답 생성
+        # command 기반의 응답생성
         bot_reply = await run_in_threadpool(custom_llm.generate_response, response_prompt)
 
-        # 4. 코드 또는 웹 결과라면 코드 추출
+        # code, web의 커맨드에 따라 추출
         if command in ("code", "web"):
             extracted = web_server.extract_all(bot_reply)
             if extracted.get("keyword"):
@@ -218,27 +218,13 @@ def setup_routes(app: FastAPI, web_server: WebServer):
         return RedirectResponse(url="/?result=" + quote(bot_reply), status_code=303)
   
     
-    # @app.post("/upload_image")
-    # async def upload_image(
-    #     file: UploadFile = File(...),
-    #     agent_id: str = Form(...)  # ← 수정된 부분
-    # ):
-    #     filename = f"agent_{agent_id}.png"
-    #     save_dir = "static"
-    #     os.makedirs(save_dir, exist_ok=True)
-    #     save_path = os.path.join(save_dir, filename)
-
-    #     with open(save_path, "wb") as f:
-    #         shutil.copyfileobj(file.file, f)
-
-    #     return JSONResponse({"status": "ok", "filename": filename})
     @app.get("/view")
     def view_image():
         global latest_image_base64
         html_content = f"""
         <html>
         <head>
-            <meta http-equiv="refresh" content="2"> <!-- 1초마다 새로고침 -->
+            <meta http-equiv="refresh" content="2"> <!-- n초마다 새로고침 -->
         </head>
         <body>
             <h2>Agent 스크린샷</h2>
@@ -257,9 +243,6 @@ def setup_routes(app: FastAPI, web_server: WebServer):
         latest_image_base64 = base64.b64encode(image_data).decode("utf-8")
         return JSONResponse({"status": "ok"})
     
-    
-
-# --- 6. FastAPI 앱 실행부 ---
 
 if __name__=="__main__":
     model_id = "google/gemma-2b-it"
