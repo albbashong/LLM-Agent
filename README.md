@@ -63,9 +63,24 @@ subprocess.run(["javac", "HelloPopup.java"], check=True)
 # 자바 실행
 subprocess.run(["java", "HelloPopup"], check=True)
 ```
+# 프로젝트 세부 내용
+## LLM model 
+본 환경은 Gemma-2b 모델을 사용했습니다.
+gemma 설치법은 
+(https://huggingface.co/google/gemma-2b) 를 참고하여 설치해 주시기 바랍니다.
+언어모델은 개인이 원하는 모델 API사용 혹은 로컬 모델을 사용하시면 됩니다.
 
 
-# How to install
+## Config
+현재 프로젝트는 
+웹서버(8000)
+LLM 서버(8001)
+agent (vnc 9001) 
+로 설정되어 있습니다.
+
+### Model
+This project uses the [`google/gemma-2b`](https://huggingface.co/google/gemma-2b) model under the [Gemma License](https://ai.google.dev/gemma/gemma-license).
+
 ## docker agent
 pip install agent_requirements.txt
 
