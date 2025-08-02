@@ -66,4 +66,8 @@ subprocess.run(["java", "HelloPopup"], check=True)
 
 
 # How to install
-코드 작성 중 
+## docker agent
+pip install agent_requirements.txt
+
+## server
+pip install server_requirements.txt
