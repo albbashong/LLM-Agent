@@ -1,97 +1,53 @@
-# LLM-Agent
+# 프로젝트 제목  
+**AI Agent 설계**
+
 ---
-본 LLM-Agent는local 모델 또는 LLM API를 이용한 agent 시스템을 구성하는 방식
 
-## 프로젝트 참여도
-이 프로젝트는 개인 단독으로 설계 및 개발하였으며, 다음과 같은 역할을 수행하였습니다.
+## 프로젝트 개요  
+다양한 AI 기술에 대한 PoC 자동화를 위한 Agent 설계
 
-- FastAPI 기반 웹서버, 자동화 에이전트, Web UI 전반 개발
-- LLM 응답 처리 구조 및 GUI 자동화 아키텍처 설계
-- Xvfb, fluxbox, xdotool, Chrome, 등 도구 통합 및 디버깅
-- LLM (Gemma 2B)과의 연동 및 코드 실행 자동화
-- Docker 기반 GUI 환경 구성 및 실시간 이미지 전송 처리
-- 전체 로직 테스트 및 문서화
-
-
-# 인터넷 검색
-https://github.com/user-attachments/assets/f75b47dd-d0fb-4642-bc06-bd2c42601444
-
-
-
-# 코드 구현
-https://github.com/user-attachments/assets/ba97a216-a3f9-4e7e-ad06-0191a1825b3c
-
-
-
-## Agent 서버 화면
-
-<img width="1912" height="1013" alt="Image" src="https://github.com/user-attachments/assets/be96d40c-1939-482d-b2ac-319baafb503e" />
-
-
-
-# 시스템 구성
 ---
-## LLM모델 서버 <-> Linux agent 서버(Docker)
 
-+ LLM모델 서버: 사용자 질의를 받고 답변을 생성 
+## 주요 기능  
 
-+ Linux agent 서버: 사용자로부터 코드 실행 혹은 프로그램과 같은 결과 실행을 원하는 경우 대리 실행자 역할 수행
-코드작성 및 실행 시 모든 언어에 대해서 조건문을 적용할 수 없으므로
-대표 코드(python)를 바탕으로 타 언어 스크립트 작성
-### LLM 모델 질문: python 코드로 자바에서 간단한 팝업창을 띄우는 코드를 만들어 줘
+### 🔹 GitHub Repo URL 기반 자연어 처리  
+사용자가 GitHub 저장소 URL을 입력하면, 에이전트가 자동으로  
 
-```
-'''python 
+- 코드를 클론하고  
+- 주요 Python 파일을 분석 및 요약  
+- 필요한 경우 수정 사항을 제안하고 실행  
 
-java_code = """
-import javax.swing.*;
+➡️ 즉, 코드 실행 및 수정 과정을 자연어로 지시할 수 있는 워크플로우를 제공  
 
-public class HelloPopup {
-    public static void main(String[] args) {
-        JOptionPane.showMessageDialog(null, "Hello, this is a Java popup!");
-    }
-}
-"""
+---
 
-with open("HelloPopup.java", "w", encoding="utf-8") as f:
-    f.write(java_code.strip())
+### 🔹 RAG 기반 자기 소개 시스템  
+에이전트는 자체 코드베이스를 RAG(Retrieval-Augmented Generation)로 학습해  
 
-print("Java 파일 생성 완료: HelloPopup.java")
-```
+- 현재 어떤 구조로 구성되어 있는지  
+- 어떤 기능과 모듈이 포함되어 있는지  
+- 개선이 필요해 보이는 부분은 무엇인지  
 
-### 스크립트 실행 코드 (python 외 언어는 구현중)
-```
-import subprocess
+스스로를 소개하듯 응답하는 기능  
 
-# java 코드 저장
-with open("HelloPopup.java", "w", encoding="utf-8") as f:
-    f.write(java_code.strip())
+➡️ 협업 관점에서 온보딩 속도 향상, 지식 베이스를 유지할 수 있도록 함  
 
-# 자바 컴파일
-subprocess.run(["javac", "HelloPopup.java"], check=True)
+---
 
-# 자바 실행
-subprocess.run(["java", "HelloPopup"], check=True)
-```
+## AI Agent 구조  
 
+### 시스템 구조
+<img width="998" height="489" alt="image" src="https://github.com/user-attachments/assets/2228897b-047d-4cbd-ac10-276238cfc02f" />
 
-# 프로젝트 세부 내용
-## LLM model 
-본 환경은 Gemma-2b 모델을 사용했습니다.
-(https://huggingface.co/google/gemma-2b)모델을 사용했습니다. 
+---
 
-## Config
-현재 프로젝트는 
-웹서버(8000)
-LLM 서버(8001)
-agent (vnc 9001) 
-로 설정되어 있습니다.
+## 기능별 프로세스  
 
-### Model
-This project uses the [`google/gemma-2b`](https://huggingface.co/google/gemma-2b) model under the [Gemma License](https://ai.google.dev/gemma/gemma-license).
+### GitHub Repo URL 기반 자연어 처리  
+<img width="1252" height="666" alt="image" src="https://github.com/user-attachments/assets/af489aa8-984f-48b3-9fe7-4e36f0ed15d5" />
 
-## docker agent
-pip install agent_requirements.txt
+---
 
-## server
-pip install server_requirements.txt
+## 작동
+<img width="1170" height="799" alt="1" src="https://github.com/user-attachments/assets/92b925e9-41f4-4e77-ae80-81a3f30618d8" />
+
